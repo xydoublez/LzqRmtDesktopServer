@@ -7,15 +7,16 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"image/png"
 	"log"
 	_ "net/http/pprof"
-
-	"image/png"
+	"runtime"
 
 	"github.com/kbinani/screenshot"
 	"github.com/valyala/fasthttp"
 )
 
+var cpu *int
 var ip, port *string
 
 /**
@@ -34,10 +35,13 @@ func CaptureScreen() *image.RGBA {
 func init() {
 	ip = flag.String("ip", "0.0.0.0", "ip address to listen on")
 	port = flag.String("port", "1218", "port to listen on")
+	cpu = flag.Int("cpu", runtime.NumCPU(), "cpu number for httpmq")
 	flag.Parse()
 }
 
 func main() {
+	runtime.GOMAXPROCS(*cpu)
+
 	m := func(ctx *fasthttp.RequestCtx) {
 
 		model := string(ctx.FormValue("model"))
